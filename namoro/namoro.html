@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Feliz 1 mês ❤️</title>
+  <style>
+    :root{ --bg:#0f1724; --card:#0b1220; --accent:#ff5c8a; --muted:#cbd5e1; }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      color:var(--muted);
+      background:linear-gradient(180deg,#071229 0%, #081428 60%);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    /* === Fundo de corações === */
+    #hearts-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 9999; /* atrás de tudo */
+      pointer-events: none; /* não bloqueia cliques */
+    }
+
+    .heart {
+      position: absolute;
+      color: var(--accent);
+      font-size: 20px;
+      opacity: 0.7;
+      animation: float 6s linear infinite;
+      filter: drop-shadow(0 0 6px rgba(255,92,138,0.3));
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) scale(0.8) rotate(0deg);
+        opacity: 0;
+      }
+      20% { opacity: 1; }
+      100% {
+        transform: translateY(-10vh) scale(1.2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .card {
+      width:100%;
+      max-width:980px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:18px;
+      box-shadow:0 12px 40px rgba(2,6,23,0.6);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.03);
+      display:grid;
+      grid-template-columns:1fr 420px;
+      z-index:2;
+      position:relative;
+    }
+    .left{padding:36px}
+    h1{margin:0;font-size:28px;color:#fff}
+    p.lead{margin:12px 0 24px;font-size:16px;line-height:1.4;color:var(--muted)}
+    .big-love{font-size:64px;line-height:1;color:var(--accent);font-weight:700;text-shadow:0 6px 20px rgba(255,92,138,0.12)}
+    .timer{margin-top:24px;font-size:18px;color:#fff;font-weight:500;text-shadow:0 2px 8px rgba(255,92,138,0.3)}
+    .controls{display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap}
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 14px;border-radius:10px;color:var(--muted);cursor:pointer}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#ff8db3);color:#fff;border:none}
+    .progress-container{width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;margin-top:10px;cursor:pointer}
+    .progress{height:100%;background:var(--accent);width:0;border-radius:4px}
+    .right{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center}
+    #slideshow{width:100%;height:480px;border-radius:12px;overflow:hidden;position:relative;background:linear-gradient(180deg,#081628,#091428)}
+    #slideshow img{width:100%;height:100%;object-fit:contain;background-color: #081628;display:block;transition:opacity .8s ease;position:absolute;top:0;left:0}
+    .dots{display:flex;gap:8px;margin-top:10px}
+    .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);cursor:pointer}
+    .dot.active{background:var(--accent)}
+    @media (max-width:880px){.card{grid-template-columns:1fr;gap:18px}.right{order:-1}.left{padding:20px}.right{padding:20px}}
+  </style>
+</head>
+<body>
+  <!-- Contêiner de corações -->
+  <div id="hearts-container"></div>
+
+  <div class="card">
+    <div class="left">
+      <h1>Feliz 1 mês de namoro ❤️</h1>
+      <p class="lead">Hoje já faz um mês desde que começamos a namorar, parece que cada dia ao seu lado tem sido bastante especial pra mim. Fiz algo simples com nossos momentos e escolhi algumas músicas que me emocionam só pra celebrar o nosso mêszinho 💕</p>
+      <p class="lead" style="display: inline-flex; align-items: center; gap: 10px;">
+  Eu te amo muito, dá até raiva
+  <img src="beijo.webp" style="width: 75px; border-radius: 15px;">
+</p>
+      </p>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div class="big-love">1 Mês</div>
+      </div>
+
+      <div class="timer" id="tempoJuntos">Carregando tempo...</div>
+
+      <div class="controls">
+        <button class="btn" id="prevSong">⟵ Música anterior</button>
+        <button class="btn primary" id="playPauseBtn">▶ Tocar música</button>
+        <button class="btn" id="nextSong">Próxima música ⟶</button>
+      </div>
+
+      <div class="progress-container" id="progressContainer">
+        <div class="progress" id="progress"></div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div id="slideshow">
+        <img src="foto1.jpeg" alt="Foto 1" style="opacity:1">
+        <img src="foto2.jpeg" alt="Foto 2" style="opacity:0">
+        <img src="foto3.jpeg" alt="Foto 3" style="opacity:0">
+        <img src="foto4.jpeg" alt="Foto 4" style="opacity:0">
+        <img src="foto5.jpeg" alt="Foto 5" style="opacity:0">
+        <img src="foto6.jpeg" alt="Foto 6" style="opacity:0">
+        <img src="foto7.jpeg" alt="Foto 7" style="opacity:0">
+        <img src="foto8.jpeg" alt="Foto 8" style="opacity:0">
+        <img src="foto9.jpeg" alt="Foto 9" style="opacity:0">
+      </div>
+      <div class="dots" id="dots"></div>
+    </div>
+  </div>
+
+  <audio id="audio" preload="auto"></audio>
+
+  <script>
+  // === Fundo com corações flutuantes ===
+  const heartsContainer = document.getElementById('hearts-container');
+  const numHearts = 25;
+  const card = document.querySelector('.card');
+
+  function criarCoracoes() {
+    const cardRect = card.getBoundingClientRect(); // posição do card
+    const limiteInferior = cardRect.top; // topo do card (limite inferior dos corações)
+
+    for (let i = 0; i < numHearts; i++) {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.innerHTML = '❤️';
+
+      const left = Math.random() * 100; // posição horizontal em porcentagem
+      const topPos = Math.random() * (limiteInferior - 100); // posição vertical, acima do card
+
+      heart.style.left = left + 'vw';
+      heart.style.top = topPos + 'px';
+      heart.style.fontSize = (12 + Math.random() * 28) + 'px';
+      heart.style.animationDuration = (6 + Math.random() * 5) + 's';
+      heart.style.opacity = Math.random() * 0.6 + 0.3;
+      heart.style.animationDelay = Math.random() * 5 + 's';
+
+      heartsContainer.appendChild(heart);
+    }
+  }
+
+  criarCoracoes();
+
+  // === Lista de músicas ===
+  const playlist = [
+    { src: "totalmente_seu.mp3", titulo: "Totalmente Seu - Marisa Monte" },
+    { src: "voce-bem-sabe.mp3", titulo: "Você Bem Sabe - Djavan" },
+    { src: "congratulations.mp3", titulo: "Congratulations - Mac Miller" },
+    { src: "sya.mp3", titulo: "See you again. - Tyler, The Creator" }
+  ];
+  let currentSong = 0;
+
+  const audio = document.getElementById("audio");
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const progress = document.getElementById("progress");
+  const progressContainer = document.getElementById("progressContainer");
+  const prevSong = document.getElementById("prevSong");
+  const nextSong = document.getElementById("nextSong");
+
+  audio.volume = 0.5;
+  audio.src = playlist[currentSong].src;
+
+  let playing = false;
+
+  function playMusic() {
+    audio.play();
+    playing = true;
+    playPauseBtn.textContent = "⏸ Pausar música";
+  }
+
+  function pauseMusic() {
+    audio.pause();
+    playing = false;
+    playPauseBtn.textContent = "▶ Tocar música";
+  }
+
+  playPauseBtn.addEventListener("click", () => {
+    playing ? pauseMusic() : playMusic();
+  });
+
+  prevSong.addEventListener("click", () => {
+    currentSong = (currentSong - 1 + playlist.length) % playlist.length;
+    audio.src = playlist[currentSong].src;
+    playMusic();
+  });
+
+  nextSong.addEventListener("click", () => {
+    currentSong = (currentSong + 1) % playlist.length;
+    audio.src = playlist[currentSong].src;
+    playMusic();
+  });
+
+  audio.addEventListener("timeupdate", () => {
+    const percent = (audio.currentTime / audio.duration) * 100;
+    progress.style.width = percent + "%";
+  });
+
+  progressContainer.addEventListener("click", (e) => {
+    const width = progressContainer.clientWidth;
+    const clickX = e.offsetX;
+    const duration = audio.duration;
+    audio.currentTime = (clickX / width) * duration;
+  });
+
+  audio.addEventListener("ended", () => {
+    currentSong = (currentSong + 1) % playlist.length;
+    audio.src = playlist[currentSong].src;
+    playMusic();
+  });
+
+  // === Contador de tempo de namoro ===
+  const inicioNamoro = new Date("2025-09-13T16:30:00");
+  const tempoJuntosEl = document.getElementById("tempoJuntos");
+  function atualizarTempo() {
+    const agora = new Date();
+    const diff = agora - inicioNamoro;
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutos = Math.floor((diff / (1000 * 60)) % 60);
+    const segundos = Math.floor((diff / 1000) % 60);
+    tempoJuntosEl.textContent = `Estamos juntos há ${dias} dia${dias !== 1 ? 's' : ''}, ${horas}h ${minutos}m ${segundos}s 💖`;
+  }
+  setInterval(atualizarTempo, 1000);
+  atualizarTempo();
+
+  // === Slideshow ===
+  const imgs = Array.from(document.querySelectorAll('#slideshow img'));
+  const dotsWrap = document.getElementById('dots');
+  let current = 0, slideInterval = null;
+  function makeDots() {
+    imgs.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'dot';
+      d.addEventListener('click', () => showSlide(i));
+      dotsWrap.appendChild(d);
+    });
+    updateDots();
+  }
+  function updateDots() {
+    Array.from(dotsWrap.children).forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+  function showSlide(i) {
+    imgs.forEach((img, idx) => img.style.opacity = (idx === i ? '1' : '0'));
+    current = i;
+    updateDots();
+  }
+  function nextSlide() { showSlide((current + 1) % imgs.length); }
+  function startAuto() { clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 3500); }
+  makeDots();
+  startAuto();
+</script>
+  </script>
+</body>
+</html>
