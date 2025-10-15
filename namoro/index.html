@@ -135,144 +135,156 @@
   <audio id="audio" preload="auto"></audio>
 
   <script>
-  // === Fundo com corações flutuantes ===
-  const heartsContainer = document.getElementById('hearts-container');
-  const numHearts = 25;
-  const card = document.querySelector('.card');
+// === Fundo com corações flutuantes ===
+const heartsContainer = document.getElementById('hearts-container');
+const numHearts = 25;
+const card = document.querySelector('.card');
 
-  function criarCoracoes() {
-    const cardRect = card.getBoundingClientRect(); // posição do card
-    const limiteInferior = cardRect.top; // topo do card (limite inferior dos corações)
+function criarCoracoes() {
+  const cardRect = card.getBoundingClientRect();
+  const limiteInferior = cardRect.top;
 
-    for (let i = 0; i < numHearts; i++) {
-      const heart = document.createElement('div');
-      heart.classList.add('heart');
-      heart.innerHTML = '❤️';
+  for (let i = 0; i < numHearts; i++) {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.innerHTML = '❤️';
 
-      const left = Math.random() * 100; // posição horizontal em porcentagem
-      const topPos = Math.random() * (limiteInferior - 100); // posição vertical, acima do card
+    const left = Math.random() * 100;
+    const topPos = Math.random() * (limiteInferior - 100);
 
-      heart.style.left = left + 'vw';
-      heart.style.top = topPos + 'px';
-      heart.style.fontSize = (12 + Math.random() * 28) + 'px';
-      heart.style.animationDuration = (6 + Math.random() * 5) + 's';
-      heart.style.opacity = Math.random() * 0.6 + 0.3;
-      heart.style.animationDelay = Math.random() * 5 + 's';
+    heart.style.left = left + 'vw';
+    heart.style.top = topPos + 'px';
+    heart.style.fontSize = (12 + Math.random() * 28) + 'px';
+    heart.style.animationDuration = (6 + Math.random() * 5) + 's';
+    heart.style.opacity = Math.random() * 0.6 + 0.3;
+    heart.style.animationDelay = Math.random() * 5 + 's';
 
-      heartsContainer.appendChild(heart);
-    }
+    heartsContainer.appendChild(heart);
   }
+}
+criarCoracoes();
 
-  criarCoracoes();
+// === Lista de músicas ===
+const playlist = [
+  { src: "totalmente_seu.mp3", titulo: "Totalmente Seu - Marisa Monte" },
+  { src: "voce-bem-sabe.mp3", titulo: "Você Bem Sabe - Djavan" },
+  { src: "congratulations.mp3", titulo: "Congratulations - Mac Miller" },
+  { src: "sya.mp3", titulo: "See You Again - Tyler, The Creator" }
+];
+let currentSong = 0;
 
-  // === Lista de músicas ===
-  const playlist = [
-    { src: "totalmente_seu.mp3", titulo: "Totalmente Seu - Marisa Monte" },
-    { src: "voce-bem-sabe.mp3", titulo: "Você Bem Sabe - Djavan" },
-    { src: "congratulations.mp3", titulo: "Congratulations - Mac Miller" },
-    { src: "sya.mp3", titulo: "See you again. - Tyler, The Creator" }
-  ];
-  let currentSong = 0;
+const audio = document.getElementById("audio");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const progress = document.getElementById("progress");
+const progressContainer = document.getElementById("progressContainer");
+const prevSong = document.getElementById("prevSong");
+const nextSong = document.getElementById("nextSong");
 
-  const audio = document.getElementById("audio");
-  const playPauseBtn = document.getElementById("playPauseBtn");
-  const progress = document.getElementById("progress");
-  const progressContainer = document.getElementById("progressContainer");
-  const prevSong = document.getElementById("prevSong");
-  const nextSong = document.getElementById("nextSong");
+// Criar display das informações
+const infoDiv = document.createElement("div");
+infoDiv.style.marginTop = "10px";
+infoDiv.style.fontSize = "16px";
+infoDiv.style.color = "#fff";
+document.querySelector(".controls").after(infoDiv);
 
-  audio.volume = 0.5;
+audio.volume = 0.5;
+audio.src = playlist[currentSong].src;
+
+let playing = false;
+
+function formatTime(sec) {
+  if (isNaN(sec)) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function atualizarInfo() {
+  infoDiv.textContent = `${playlist[currentSong].titulo} — ${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+}
+
+function playMusic() {
+  audio.play();
+  playing = true;
+  playPauseBtn.textContent = "⏸ Pausar música";
+}
+function pauseMusic() {
+  audio.pause();
+  playing = false;
+  playPauseBtn.textContent = "▶ Tocar música";
+}
+
+playPauseBtn.addEventListener("click", () => playing ? pauseMusic() : playMusic());
+prevSong.addEventListener("click", () => {
+  currentSong = (currentSong - 1 + playlist.length) % playlist.length;
   audio.src = playlist[currentSong].src;
+  playMusic();
+});
+nextSong.addEventListener("click", () => {
+  currentSong = (currentSong + 1) % playlist.length;
+  audio.src = playlist[currentSong].src;
+  playMusic();
+});
 
-  let playing = false;
+audio.addEventListener("timeupdate", () => {
+  const percent = (audio.currentTime / audio.duration) * 100;
+  progress.style.width = percent + "%";
+  atualizarInfo();
+});
+audio.addEventListener("loadedmetadata", atualizarInfo);
+audio.addEventListener("ended", () => {
+  currentSong = (currentSong + 1) % playlist.length;
+  audio.src = playlist[currentSong].src;
+  playMusic();
+});
 
-  function playMusic() {
-    audio.play();
-    playing = true;
-    playPauseBtn.textContent = "⏸ Pausar música";
-  }
+progressContainer.addEventListener("click", (e) => {
+  const width = progressContainer.clientWidth;
+  const clickX = e.offsetX;
+  const duration = audio.duration;
+  audio.currentTime = (clickX / width) * duration;
+});
 
-  function pauseMusic() {
-    audio.pause();
-    playing = false;
-    playPauseBtn.textContent = "▶ Tocar música";
-  }
+// === Contador de tempo de namoro ===
+const inicioNamoro = new Date("2025-09-13T16:30:00");
+const tempoJuntosEl = document.getElementById("tempoJuntos");
+function atualizarTempo() {
+  const agora = new Date();
+  const diff = agora - inicioNamoro;
+  const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutos = Math.floor((diff / (1000 * 60)) % 60);
+  const segundos = Math.floor((diff / 1000) % 60);
+  tempoJuntosEl.textContent = `Estamos juntos há ${dias} dia${dias !== 1 ? 's' : ''}, ${horas}h ${minutos}m ${segundos}s 💖`;
+}
+setInterval(atualizarTempo, 1000);
+atualizarTempo();
 
-  playPauseBtn.addEventListener("click", () => {
-    playing ? pauseMusic() : playMusic();
+// === Slideshow ===
+const imgs = Array.from(document.querySelectorAll('#slideshow img'));
+const dotsWrap = document.getElementById('dots');
+let current = 0, slideInterval = null;
+function makeDots() {
+  imgs.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.addEventListener('click', () => showSlide(i));
+    dotsWrap.appendChild(d);
   });
-
-  prevSong.addEventListener("click", () => {
-    currentSong = (currentSong - 1 + playlist.length) % playlist.length;
-    audio.src = playlist[currentSong].src;
-    playMusic();
-  });
-
-  nextSong.addEventListener("click", () => {
-    currentSong = (currentSong + 1) % playlist.length;
-    audio.src = playlist[currentSong].src;
-    playMusic();
-  });
-
-  audio.addEventListener("timeupdate", () => {
-    const percent = (audio.currentTime / audio.duration) * 100;
-    progress.style.width = percent + "%";
-  });
-
-  progressContainer.addEventListener("click", (e) => {
-    const width = progressContainer.clientWidth;
-    const clickX = e.offsetX;
-    const duration = audio.duration;
-    audio.currentTime = (clickX / width) * duration;
-  });
-
-  audio.addEventListener("ended", () => {
-    currentSong = (currentSong + 1) % playlist.length;
-    audio.src = playlist[currentSong].src;
-    playMusic();
-  });
-
-  // === Contador de tempo de namoro ===
-  const inicioNamoro = new Date("2025-09-13T16:30:00");
-  const tempoJuntosEl = document.getElementById("tempoJuntos");
-  function atualizarTempo() {
-    const agora = new Date();
-    const diff = agora - inicioNamoro;
-    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutos = Math.floor((diff / (1000 * 60)) % 60);
-    const segundos = Math.floor((diff / 1000) % 60);
-    tempoJuntosEl.textContent = `Estamos juntos há ${dias} dia${dias !== 1 ? 's' : ''}, ${horas}h ${minutos}m ${segundos}s 💖`;
-  }
-  setInterval(atualizarTempo, 1000);
-  atualizarTempo();
-
-  // === Slideshow ===
-  const imgs = Array.from(document.querySelectorAll('#slideshow img'));
-  const dotsWrap = document.getElementById('dots');
-  let current = 0, slideInterval = null;
-  function makeDots() {
-    imgs.forEach((_, i) => {
-      const d = document.createElement('div');
-      d.className = 'dot';
-      d.addEventListener('click', () => showSlide(i));
-      dotsWrap.appendChild(d);
-    });
-    updateDots();
-  }
-  function updateDots() {
-    Array.from(dotsWrap.children).forEach((d, i) => d.classList.toggle('active', i === current));
-  }
-  function showSlide(i) {
-    imgs.forEach((img, idx) => img.style.opacity = (idx === i ? '1' : '0'));
-    current = i;
-    updateDots();
-  }
-  function nextSlide() { showSlide((current + 1) % imgs.length); }
-  function startAuto() { clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 3500); }
-  makeDots();
-  startAuto();
+  updateDots();
+}
+function updateDots() {
+  Array.from(dotsWrap.children).forEach((d, i) => d.classList.toggle('active', i === current));
+}
+function showSlide(i) {
+  imgs.forEach((img, idx) => img.style.opacity = (idx === i ? '1' : '0'));
+  current = i;
+  updateDots();
+}
+function nextSlide() { showSlide((current + 1) % imgs.length); }
+function startAuto() { clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 3500); }
+makeDots();
+startAuto();
 </script>
-  </script>
 </body>
 </html>
