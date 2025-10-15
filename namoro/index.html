@@ -22,16 +22,17 @@
     }
 
     /* === Fundo de corações === */
-    #hearts-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      z-index: 9999; /* atrás de tudo */
-    }
-
+    
+#hearts-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0; /* atrás de tudo */
+  pointer-events: none; /* ✅ permite clicar nos elementos abaixo */
+}
     .heart {
       position: absolute;
       color: var(--accent);
@@ -287,4 +288,5 @@ startAuto();
 </script>
 </body>
 </html>
+
 
